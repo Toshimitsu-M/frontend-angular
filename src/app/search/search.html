@@ -1,0 +1,94 @@
+<p>search works!</p>
+
+<div class="container">
+  <h1 class="title">施設情報検索</h1>
+
+  <!-- 検索フォーム -->
+  <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form">
+    <div class="form-row">
+      <!-- カテゴリー選択 -->
+      <div class="form-group">
+        <label class="form-label">
+          カテゴリー <span class="required">*</span>
+        </label>
+        <select 
+          class="form-control"
+          [class.error]="hasError('category')"
+          formControlName="category">
+          <option value="">選択してください</option>
+          <option value="all">すべて</option>
+          <option value="facility">施設</option>
+          <option value="report">レポート</option>
+        </select>
+        <div class="error-message" *ngIf="hasError('category')">
+          <span class="error-icon">⚠</span>
+          {{ getErrorMessage('category') }}
+        </div>
+      </div>
+
+      <!-- キーワード入力 -->
+      <div class="form-group">
+        <label class="form-label">
+          キーワード <span class="required">*</span>
+        </label>
+        <input 
+          type="text"
+          class="form-control"
+          [class.error]="hasError('keyword')"
+          formControlName="keyword"
+          placeholder="施設名またはファイル名を入力">
+        <div class="error-message" *ngIf="hasError('keyword')">
+          <span class="error-icon">⚠</span>
+          {{ getErrorMessage('keyword') }}
+        </div>
+      </div>
+    </div>
+
+    <!-- 検索ボタン -->
+    <div class="button-container">
+      <button class="search-button" (click)="onSearch()">
+        🔍 検索
+      </button>
+    </div>
+  </form>
+
+  <!-- 検索結果 -->
+  <div class="results-container" *ngIf="hasSearched">
+    <h2 class="results-title">
+      検索結果 ({{ searchResults.length }}件)
+    </h2>
+
+    <div *ngIf="searchResults.length > 0; else noResults">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>施設名</th>
+            <th>通知日時</th>
+            <th>ファイル名</th>
+            <th class="text-center">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let result of searchResults">
+            <td>{{ result.facilityName }}</td>
+            <td>{{ result.notificationDate }}</td>
+            <td>{{ result.fileName }}</td>
+            <td class="text-center">
+              <button 
+                class="download-button"
+                (click)="onDownload(result.fileName)">
+                ⬇ ダウンロード
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noResults>
+      <div class="no-results">
+        検索条件に一致する結果が見つかりませんでした
+      </div>
+    </ng-template>
+  </div>
+</div>
