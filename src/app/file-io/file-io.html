@@ -1,0 +1,112 @@
+<p>file-io works!</p>
+
+<div class="container">
+  <h1>ファイル入出力 (PDF/Excel)</h1>
+  
+  <div class="section">
+    <h2>ファイルをアップロード</h2>
+    <div class="upload-area">
+      <input 
+        type="file" 
+        #fileInput
+        (change)="onFileSelected($event)"
+        accept=".pdf,.xlsx,.xls"
+      />
+      <button (click)="fileInput.click()" class="btn btn-primary">
+        ファイルを選択
+      </button>
+      <span *ngIf="selectedFileName" class="file-name">
+        {{ selectedFileName }}
+      </span>
+    </div>
+    <p class="help-text">対応形式: PDF (.pdf), Excel (.xlsx, .xls)</p>
+  </div>
+
+  <div class="section" *ngIf="fileType === 'pdf' && pdfText">
+    <h2>PDF内容</h2>
+    <div class="file-info">
+      <p><strong>ファイル名:</strong> {{ selectedFileName }}</p>
+      <p><strong>抽出されたテキスト</strong></p>
+    </div>
+    
+    <textarea 
+      [(ngModel)]="pdfText"
+      class="content-area"
+      placeholder="PDFから抽出されたテキストがここに表示されます..."
+    ></textarea>
+    
+    <div class="button-group">
+      <button (click)="downloadAsText()" class="btn btn-success">
+        テキストとしてダウンロード
+      </button>
+      <button (click)="clearContent()" class="btn btn-secondary">
+        クリア
+      </button>
+    </div>
+  </div>
+
+  <div class="section" *ngIf="fileType === 'excel' && excelData">
+    <h2>Excel内容</h2>
+    <div class="file-info">
+      <p><strong>ファイル名:</strong> {{ selectedFileName }}</p>
+      <p><strong>シート数:</strong> {{ getSheetNames().length }}</p>
+    </div>
+    
+    <div class="sheet-selector">
+      <label>シートを選択: </label>
+      <select [(ngModel)]="selectedSheet" class="extension-select">
+        <option *ngFor="let sheet of getSheetNames()" [value]="sheet">
+          {{ sheet }}
+        </option>
+      </select>
+    </div>
+
+    <div class="table-container" *ngIf="selectedSheet">
+      <table class="excel-table">
+        <tbody>
+          <tr *ngFor="let row of excelData.sheets[selectedSheet]">
+            <td *ngFor="let cell of row">{{ cell }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="button-group">
+      <button (click)="downloadExcel()" class="btn btn-success">
+        Excelをダウンロード
+      </button>
+      <button (click)="downloadAsCSV()" class="btn btn-info">
+        CSVとしてダウンロード
+      </button>
+      <button (click)="clearContent()" class="btn btn-secondary">
+        クリア
+      </button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>新規Excel作成</h2>
+    <div class="create-area">
+      <input 
+        type="text" 
+        [(ngModel)]="newFileName"
+        placeholder="ファイル名を入力"
+        class="file-name-input"
+      />
+      <span>.xlsx</span>
+    </div>
+    
+    <div class="excel-creator">
+      <p>簡易データ入力 (カンマ区切り、改行で次の行)</p>
+      <textarea 
+        [(ngModel)]="newExcelContent"
+        class="content-area"
+        placeholder="例:&#10;名前,年齢,部署&#10;山田太郎,30,営業部&#10;佐藤花子,25,開発部"
+      ></textarea>
+    </div>
+    
+    <button (click)="createExcel()" class="btn btn-primary">
+      Excelを作成してダウンロード
+    </button>
+  </div>
+</div>
